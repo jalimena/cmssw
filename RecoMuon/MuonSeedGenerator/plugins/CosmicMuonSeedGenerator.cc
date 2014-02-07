@@ -306,7 +306,8 @@ std::vector<TrajectorySeed> CosmicMuonSeedGenerator::createSeed(const MuonRecHit
   MuonPatternRecoDumper dumper;
   
   // set the pt by hand
-  double pt = 10.0;
+  //double pt = 10.0;
+  double pt = 100.0;
 
   // AlgebraicVector4 t;
   AlgebraicSymMatrix mat(5,0);
