@@ -1,13 +1,11 @@
-# /dev/CMSSW_7_1_1/PIon/V3 (CMSSW_7_1_0_pre6)
+# /dev/CMSSW_7_1_1/PIon/V9 (CMSSW_7_1_0_pre6)
 
 import FWCore.ParameterSet.Config as cms
 
 
 HLTConfigVersion = cms.PSet(
-  tableName = cms.string('/dev/CMSSW_7_1_1/PIon/V3')
+  tableName = cms.string('/dev/CMSSW_7_1_1/PIon/V9')
 )
-
-streams = cms.PSet(  A = cms.vstring(  ) )
 
 hltESSHcalSeverityLevel = cms.ESSource( "EmptyESSource",
   iovIsRunNotTime = cms.bool( True ),
