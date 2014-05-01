@@ -1,0 +1,67 @@
+import FWCore.ParameterSet.Config as cms
+
+process = cms.Process("Test")
+
+process.source = cms.Source("PoolSource",
+    #debugFlag = cms.untracked.bool(True),
+    #debugVebosity = cms.untracked.uint32(1),
+	
+    fileNames = cms.untracked.vstring(
+
+        #'/store/relval/CMSSW_3_2_1/RelValSingleMuPt100/GEN-SIM-RECO/MC_31X_V3-v1/0006/DC15F12B-9477-DE11-B1E0-000423D98C20.root',
+        #'/store/relval/CMSSW_3_2_1/RelValSingleMuPt100/GEN-SIM-RECO/MC_31X_V3-v1/0006/40D6FEFD-8F77-DE11-95A7-001D09F27067.root',
+        #'/store/relval/CMSSW_3_2_1/RelValSingleMuPt100/GEN-SIM-RECO/MC_31X_V3-v1/0005/50EE1208-8177-DE11-8B17-001D09F231B0.root'
+    'root://eoscms//eos/cms/store/user/jalimena/HSCPmchamp6_M-600_TuneZ2star_8TeV-pythia6/reco_mchamp600_533_noPU_forceMuons/a5fd4cac2592ce07df32b7c4e3a336e1/step3_RAW2DIGI_HLT_L1Reco_RECO_34_1_w58.root'
+    )
+)
+
+process.maxEvents = cms.untracked.PSet(
+	input=cms.untracked.int32(100)
+        #input=cms.untracked.int32(-1)
+)
+
+process.load("Configuration.Geometry.GeometryIdeal_cff")
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Geometry.CMSCommonData.cmsIdealGeometryXML_cfi")
+process.load("Geometry.CommonDetUnit.globalTrackingGeometry_cfi")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load("Configuration.StandardSequences.Reconstruction_cff")
+process.load("RecoMuon.MuonIdentification.muonTimingDelayedMuons_cfi")
+from Configuration.StandardSequences.Reconstruction_cff import *
+from RecoMuon.MuonIdentification.muonTimingDelayedMuons_cfi import *
+
+process.muonAnalyzer = cms.EDAnalyzer("MuonTimingValidatorDelayedMuons",
+                                      TKtracks = cms.untracked.InputTag("generalTracks"),
+                                      STAtracks = cms.untracked.InputTag("standAloneMuons"),
+                                      Muons = cms.untracked.InputTag("muons"),
+                                      nbins = cms.int32(100),
+                                      #nbins = cms.int32(60),
+                                      PtresMax = cms.double(200.0),
+                                      #PtresMax = cms.double(2000.0),
+                                      Timing = cms.untracked.InputTag("muontimingDelayedMuons"),
+                                      simPtMin = cms.double(5.0),
+                                      PtresMin = cms.double(-1000.0),
+                                      PtCut = cms.double(20.0),
+                                      #PtCut = cms.double(1.0),
+                                      etaMax = cms.double(2.4),
+                                      etaMin = cms.double(0.0),
+                                      PlotScale = cms.double(1.0),
+                                      DTcut  = cms.int32(8),
+                                      CSCcut = cms.int32(4),
+                                      open = cms.string('recreate'),
+                                      out = cms.string('test_timing_mchamp600.root')
+                                      )
+
+#process.prefer("GlobalTag")
+
+process.GlobalTag.globaltag = 'FT_53_V10_AN2::All'
+#process.GlobalTag.globaltag = 'MC_3XY_V14::All'
+#process.GlobalTag.globaltag = 'STARTUP_V7::All'
+
+process.p = cms.Path(muontimingDelayedMuons)
+
+process.mutest = cms.Path(process.muonAnalyzer)
+
+process.schedule = cms.Schedule(process.p,process.mutest)	
+# process.schedule = cms.Schedule(process.mutest)	
+
