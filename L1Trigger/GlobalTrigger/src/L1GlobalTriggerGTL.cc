@@ -482,7 +482,8 @@ void L1GlobalTriggerGTL::run(
                 }
                     break;
                 case CondExternal: {
-                    bool externalCondResult = true;
+		  //bool externalCondResult = true;
+		  bool externalCondResult = false; //delayed muons
 
                     // FIXME need a solution to read External with real value
 

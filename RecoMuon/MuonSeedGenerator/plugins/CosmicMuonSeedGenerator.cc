@@ -323,12 +323,12 @@ std::vector<TrajectorySeed> CosmicMuonSeedGenerator::createSeed(const MuonRecHit
                                              hit->globalDirection().phi(),
                                              1.));
   // Force all track downward for cosmic, not beam-halo
-  if (hit->geographicalId().subdetId() == MuonSubdetId::DT && fabs(hit->globalDirection().eta()) < 4.0 && hit->globalDirection().phi() > 0 ) 
-    polar = - polar;
+  //if (hit->geographicalId().subdetId() == MuonSubdetId::DT && fabs(hit->globalDirection().eta()) < 4.0 && hit->globalDirection().phi() > 0 ) 
+  //polar = - polar;
 
-  if (hit->geographicalId().subdetId() == MuonSubdetId::CSC && fabs(hit->globalDirection().eta()) > 2.3 ) {
-    polar = - polar;
-  }
+  //if (hit->geographicalId().subdetId() == MuonSubdetId::CSC && fabs(hit->globalDirection().eta()) > 2.3 ) {
+  //polar = - polar;
+  //}
 
   polar *=fabs(pt)/polar.perp();
 
@@ -480,12 +480,12 @@ std::vector<TrajectorySeed> CosmicMuonSeedGenerator::createSeed(const CosmicMuon
                                              hit->globalDirection().phi(),
                                              1.));
   // Force all track downward for cosmic, not beam-halo
-  if (hit->geographicalId().subdetId() == MuonSubdetId::DT && fabs(hit->globalDirection().eta()) < 4.0 && hit->globalDirection().phi() > 0 ) 
-    polar = - polar;
+  //if (hit->geographicalId().subdetId() == MuonSubdetId::DT && fabs(hit->globalDirection().eta()) < 4.0 && hit->globalDirection().phi() > 0 ) 
+  //polar = - polar;
 
-  if (hit->geographicalId().subdetId() == MuonSubdetId::CSC && fabs(hit->globalDirection().eta()) > 2.3 ) {
-    polar = - polar;
-  }
+  //if (hit->geographicalId().subdetId() == MuonSubdetId::CSC && fabs(hit->globalDirection().eta()) > 2.3 ) {
+  //polar = - polar;
+  //}
 
   polar *=fabs(pt)/polar.perp();
 
