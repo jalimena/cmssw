@@ -20,6 +20,7 @@ ExhaustiveMuonTrajectoryBuilder::~ExhaustiveMuonTrajectoryBuilder() {}
 MuonTrajectoryBuilder::TrajectoryContainer 
 ExhaustiveMuonTrajectoryBuilder::trajectories(const TrajectorySeed& seed)
 {
+  std::cout<<"starting to build trajectory for exhaustive muon trajectory builder"<<std::endl;
   LocalTrajectoryParameters localTrajectoryParameters(seed.startingState().parameters());
   LocalVector p(localTrajectoryParameters.momentum());
   int rawId = seed.startingState().detId();
@@ -28,12 +29,15 @@ ExhaustiveMuonTrajectoryBuilder::trajectories(const TrajectorySeed& seed)
   // homemade local-to-global
   double pt = (isBarrel) ? -p.z() : p.perp();
   pt *= localTrajectoryParameters.charge();
+  std::cout<<"pt for exhaustive trajectory is: "<<pt<<std::endl;
   float err00 = seed.startingState().error(0);
   //   float p_err = sqr(sptmean/(ptmean*ptmean));
   //  mat[0][0]= p_err;
   float sigmapt = sqrt(err00)*pt*pt;
   TrajectorySeed::range range = seed.recHits();
+  std::cout<<"seed.nHits() is: "<<seed.nHits()<<std::endl;
   TrajectoryContainer result;
+  int count = 0;
   // Make a new seed based on each segment, using the original pt and sigmapt
   for(TrajectorySeed::const_iterator recHitItr = range.first;
       recHitItr != range.second; ++recHitItr)
@@ -44,9 +48,12 @@ ExhaustiveMuonTrajectoryBuilder::trajectories(const TrajectorySeed& seed)
     TrajectorySeed tmpSeed(theSeeder.createSeed(pt, sigmapt, muonRecHit));
     TrajectoryContainer trajectories(theTrajBuilder.trajectories(tmpSeed));
     result.insert(result.end(), trajectories.begin(), trajectories.end());
+    std::cout<<"making seed for segment "<<count<<std::endl;
+    count++;
   }
   // choose the best trajectory
   if(!result.empty()) clean(result);
+  std::cout<<" exhaustive muon trajectory cleaned"<<std::endl;
   return result;
 }
 
@@ -67,6 +74,7 @@ void ExhaustiveMuonTrajectoryBuilder::setEvent(const edm::Event& event)
 
 void ExhaustiveMuonTrajectoryBuilder::clean(TrajectoryContainer & trajectories) const
 {
+  std::cout<<"starting to clean trajectory for exhaustive muon trajectory builder"<<std::endl;
   // choose the one with the most hits, and the smallest chi-squared
   int best_nhits = 0;
   unsigned best = 0;

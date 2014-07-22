@@ -117,7 +117,7 @@ MuonTrajectoryUpdator::update(const TrajectoryMeasurement* measurement,
   
   TrajectoryStateOnSurface lastUpdatedTSOS = measurement->predictedState();
   
-  LogTrace(metname)<<"Number of rechits for the fit: "<<recHitsForFit.size()<<endl;
+  std::cout<<"Number of rechits for the fit: "<<recHitsForFit.size()<<endl;
  
   TransientTrackingRecHit::ConstRecHitContainer::iterator recHit;
   for(recHit = recHitsForFit.begin(); recHit != recHitsForFit.end(); ++recHit ) {
@@ -130,7 +130,7 @@ MuonTrajectoryUpdator::update(const TrajectoryMeasurement* measurement,
       if ( propagatedTSOS.isValid() ) {
         pair<bool,double> thisChi2 = estimator()->estimate(propagatedTSOS, *((*recHit).get()));
 
-	LogTrace(metname) << "Estimation for Kalman Fit. Chi2: " << thisChi2.second;
+	std::cout << "Estimation for Kalman Fit. Chi2: " << thisChi2.second;
 
 	// Is an RPC hit? Prepare the variable to possibly exluding it from the fit
 	bool wantIncludeThisHit = true;
@@ -138,7 +138,7 @@ MuonTrajectoryUpdator::update(const TrajectoryMeasurement* measurement,
 	    (*recHit)->geographicalId().det() == DetId::Muon &&
 	    (*recHit)->geographicalId().subdetId() == MuonSubdetId::RPC){
 	  wantIncludeThisHit = false;	
-	  LogTrace(metname) << "This is an RPC hit and the present configuration is such that it will be excluded from the fit";
+	  std::cout << "This is an RPC hit and the present configuration is such that it will be excluded from the fit";
 	}
 
 	
@@ -149,9 +149,9 @@ MuonTrajectoryUpdator::update(const TrajectoryMeasurement* measurement,
           updated=true;
 	  if (wantIncludeThisHit) { // This split is a trick to have the RPC hits counted as updatable (in used chamber counting), while are not actually included in the fit when the proper obtion is activated.
 
-          LogTrace(metname) << endl 
+          std::cout << endl 
 			    << "     Kalman Start" << "\n" << "\n";
-          LogTrace(metname) << "  Meas. Position : " << (**recHit).globalPosition() << "\n"
+          std::cout << "  Meas. Position : " << (**recHit).globalPosition() << "\n"
 			    << "  Pred. Position : " << propagatedTSOS.globalPosition()
 			    << "  Pred Direction : " << propagatedTSOS.globalDirection()<< endl;
 
@@ -162,16 +162,16 @@ MuonTrajectoryUpdator::update(const TrajectoryMeasurement* measurement,
 
           lastUpdatedTSOS = measurementUpdator()->update(propagatedTSOS,*((*recHit).get()));
 
-          LogTrace(metname) << "  Fit   Position : " << lastUpdatedTSOS.globalPosition()
+          std::cout << "  Fit   Position : " << lastUpdatedTSOS.globalPosition()
 			    << "  Fit  Direction : " << lastUpdatedTSOS.globalDirection()
 			    << "\n"
 			    << "  Fit position radius : " 
 			    << lastUpdatedTSOS.globalPosition().perp()
 			    << "filter updated" << endl;
 	  
-	  LogTrace(metname) << muonDumper.dumpTSOS(lastUpdatedTSOS);
+	  std::cout << muonDumper.dumpTSOS(lastUpdatedTSOS);
 	  
-	  LogTrace(metname) << "\n\n     Kalman End" << "\n" << "\n";	      
+	  std::cout << "\n\n     Kalman End" << "\n" << "\n";	      
 	  
 	  TrajectoryMeasurement && updatedMeasurement = updateMeasurement( propagatedTSOS, lastUpdatedTSOS, 
 									*recHit, thisChi2.second, detLayer, 
@@ -180,7 +180,7 @@ MuonTrajectoryUpdator::update(const TrajectoryMeasurement* measurement,
 	  trajectory.push(std::move(updatedMeasurement), thisChi2.second);	
 	  }
 	  else {
-	    LogTrace(metname) << "  Compatible RecHit with good chi2 but made with RPC when it was decided to not include it in the fit"
+	    std::cout << "  Compatible RecHit with good chi2 but made with RPC when it was decided to not include it in the fit"
 			      << "  --> trajectory NOT updated, invalid RecHit added." << endl;
 	      
 	    MuonTransientTrackingRecHit::MuonRecHitPointer invalidRhPtr = MuonTransientTrackingRecHit::specificBuild( (*recHit)->det(), (*recHit)->hit() );
@@ -191,7 +191,7 @@ MuonTrajectoryUpdator::update(const TrajectoryMeasurement* measurement,
 	}
 	else {
           if(useInvalidHits) {
-            LogTrace(metname) << "  Compatible RecHit with too large chi2"
+            std::cout << "  Compatible RecHit with too large chi2"
 			    << "  --> trajectory NOT updated, invalid RecHit added." << endl;
 
 	    MuonTransientTrackingRecHit::MuonRecHitPointer invalidRhPtr = MuonTransientTrackingRecHit::specificBuild( (*recHit)->det(), (*recHit)->hit() );

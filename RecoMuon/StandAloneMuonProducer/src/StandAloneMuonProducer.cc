@@ -65,6 +65,7 @@ StandAloneMuonProducer::StandAloneMuonProducer(const ParameterSet& parameterSet)
   MuonTrajectoryBuilder * trajectoryBuilder = 0;
   // instantiate the concrete trajectory builder in the Track Finder
   string typeOfBuilder = parameterSet.getParameter<string>("MuonTrajectoryBuilder");
+  std::cout<<"typeOfBuilder is: "<<typeOfBuilder<<std::endl;
   if(typeOfBuilder == "StandAloneMuonTrajectoryBuilder")
     trajectoryBuilder = new StandAloneMuonTrajectoryBuilder(trajectoryBuilderParameters,theService,iC);
   else if(typeOfBuilder == "DirectMuonTrajectoryBuilder")
@@ -107,11 +108,11 @@ StandAloneMuonProducer::~StandAloneMuonProducer(){
 void StandAloneMuonProducer::produce(Event& event, const EventSetup& eventSetup){
   const std::string metname = "Muon|RecoMuon|StandAloneMuonProducer";
   
-  LogTrace(metname)<<endl<<endl<<endl;
-  LogTrace(metname)<<"Stand Alone Muon Reconstruction Started"<<endl;
+  std::cout<<endl<<endl<<endl;
+  std::cout<<"Stand Alone Muon Reconstruction Started"<<endl;
 
   // Take the seeds container
-  LogTrace(metname)<<"Taking the seeds: "<<theSeedCollectionLabel.label()<<endl;
+  std::cout<<"Taking the seeds: "<<theSeedCollectionLabel.label()<<endl;
   Handle<View<TrajectorySeed> > seeds; 
   event.getByToken(seedToken,seeds);
 
@@ -120,10 +121,10 @@ void StandAloneMuonProducer::produce(Event& event, const EventSetup& eventSetup)
   NavigationSetter setter(*theService->muonNavigationSchool());
 
   // Reconstruct 
-  LogTrace(metname)<<"Track Reconstruction"<<endl;
+  std::cout<<"Track Reconstruction"<<endl;
   theTrackFinder->reconstruct(seeds,event);
  
-  LogTrace(metname)<<"Event loaded"
+  std::cout<<"Event loaded"
 		   <<"================================"
 		   <<endl<<endl;
 }

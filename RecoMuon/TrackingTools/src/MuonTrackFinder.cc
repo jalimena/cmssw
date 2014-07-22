@@ -79,7 +79,7 @@ MuonTrackFinder::reconstruct(const edm::Handle<edm::View<TrajectorySeed> >& seed
 			     edm::Event& event){
   
   const string metname = "Muon|RecoMuon|MuonTrackFinder";
-  LogTrace(metname)<<"SA Recostruction starting from: "<<seeds->size()<<endl;  
+  std::cout<<"MuonTrackFinder SA Recostruction starting from: "<<seeds->size()<<endl;  
   
   // Percolate the event 
   setEvent(event);
@@ -91,7 +91,7 @@ MuonTrackFinder::reconstruct(const edm::Handle<edm::View<TrajectorySeed> >& seed
   edm::View<TrajectorySeed>::const_iterator seed;
   for(seed = seeds->begin();
       seed != seeds->end(); ++seed, ++nSeed){
-    LogTrace(metname)<<"+++ New Seed +++"<<endl;
+    std::cout<<"+++ New Seed +++"<<endl;
     TrajectoryContainer muonTrajs_temp = theTrajBuilder->trajectories(*seed);
     for(TrajectoryContainer::iterator it = muonTrajs_temp.begin(); 
 	it != muonTrajs_temp.end(); ++it){
@@ -101,11 +101,11 @@ MuonTrackFinder::reconstruct(const edm::Handle<edm::View<TrajectorySeed> >& seed
   }
   
   // clean the clone traj
-  LogTrace(metname)<<"Clean the trajectories container"<<endl;
+  std::cout<<"Clean the trajectories container"<<endl;
   if(theTrajCleaner) theTrajCleaner->clean(muonTrajectories, event); //used by reference...
   
   // convert the trajectories into tracks and load them in to the event
-  LogTrace(metname)
+  std::cout
     <<"Convert the trajectories into tracks and load them in to the event"<<endl;
   return load(muonTrajectories,event);
   
@@ -134,7 +134,7 @@ void MuonTrackFinder::reconstruct(const std::vector<TrackCand>& staCandColl,
   if(theTrajCleaner) theTrajCleaner->clean(muonCandidates);
 
   // convert the trajectories into staTracks and load them into the event
-  LogTrace(metname)<<"Load Muon Candidates into the event"<<endl;
+  std::cout<<"Load Muon Candidates into the event"<<endl;
   load(muonCandidates,event);
 
 }

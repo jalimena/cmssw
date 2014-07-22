@@ -9,8 +9,10 @@ standAloneMuons = cms.EDProducer(
     MuonTrackLoaderForSTA,
     MuonServiceProxy,
     #                                 InputObjects = cms.InputTag("mergedStandAloneMuonSeeds"),
-    InputObjects = cms.InputTag("ancientMuonSeed"),
+    #InputObjects = cms.InputTag("ancientMuonSeed"),
+    InputObjects = cms.InputTag("CosmicMuonSeed"),
     MuonTrajectoryBuilder = cms.string("Exhaustive"),
+    #MuonTrajectoryBuilder = cms.string("StandAloneMuonTrajectoryBuilder"),
     STATrajBuilderParameters = cms.PSet(
         NavigationType = cms.string('Standard'),
         SeedPosition = cms.string('in'),

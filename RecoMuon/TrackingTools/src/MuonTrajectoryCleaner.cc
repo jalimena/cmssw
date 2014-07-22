@@ -82,16 +82,16 @@ void MuonTrajectoryCleaner::clean(TrajectoryContainer& trajC, edm::Event& event)
       double chi2_dof_i = (*iter)->ndof() > 0 ? (*iter)->chiSquared()/(*iter)->ndof() : (*iter)->chiSquared()/1e-10;
       double chi2_dof_j = (*jter)->ndof() > 0 ? (*jter)->chiSquared()/(*jter)->ndof() : (*jter)->chiSquared()/1e-10;
 
-      LogTrace(metname) << " MuonTrajectoryCleaner:";
-      LogTrace(metname) << " * trajC " << i 
+      std::cout << " MuonTrajectoryCleaner:";
+      std::cout << " * trajC " << i 
 			<< " (pT="<<(*iter)->lastMeasurement().updatedState().globalMomentum().perp() 
 			<< " GeV) - chi2/nDOF = " << (*iter)->chiSquared() << "/" << (*iter)->ndof() << " = " << chi2_dof_i;
-      LogTrace(metname)	<< "     - valid RH = " << (*iter)->foundHits() << " / total RH = " <<  nTotHits_i << " / total 1D RH = " << nTot1DHits_i;
-      LogTrace(metname)	<< " * trajC " << j 
+      std::cout	<< "     - valid RH = " << (*iter)->foundHits() << " / total RH = " <<  nTotHits_i << " / total 1D RH = " << nTot1DHits_i;
+      std::cout	<< " * trajC " << j 
 			<< " (pT="<<(*jter)->lastMeasurement().updatedState().globalMomentum().perp() 
 			<< " GeV) - chi2/nDOF = " << (*jter)->chiSquared() << "/" << (*jter)->ndof() << " = " << chi2_dof_j;
-      LogTrace(metname)	<< "     - valid RH = " << (*jter)->foundHits() << " / total RH = " <<  nTotHits_j << " / total 1D RH = " << nTot1DHits_j;
-      LogTrace(metname)	<< " *** Shared 1D RecHits: " << match;
+      std::cout	<< "     - valid RH = " << (*jter)->foundHits() << " / total RH = " <<  nTotHits_j << " / total 1D RH = " << nTot1DHits_j;
+      std::cout	<< " *** Shared 1D RecHits: " << match;
 
       int hit_diff =  (*iter)->foundHits() - (*jter)->foundHits() ;       
       // If there are matches, reject the worst track
@@ -121,14 +121,14 @@ void MuonTrajectoryCleaner::clean(TrajectoryContainer& trajC, edm::Event& event)
 	      skipnext=true;
 	      seedmap[j].insert(seedmap[j].end(), seedmap[i].begin(), seedmap[i].end());
 	      seedmap.erase(i);
-	      LogTrace(metname) << "Trajectory # " << i << " (pT="<<(*iter)->lastMeasurement().updatedState().globalMomentum().perp() 
+	      std::cout << "Trajectory # " << i << " (pT="<<(*iter)->lastMeasurement().updatedState().globalMomentum().perp() 
 				<< " GeV) rejected because it has too low pt";
 	    } 
 	    else {
 	      mask[j] = false;
 	      seedmap[i].insert(seedmap[i].end(), seedmap[j].begin(), seedmap[j].end());
 	      seedmap.erase(j);
-	      LogTrace(metname) << "Trajectory # " << j << " (pT="<<(*jter)->lastMeasurement().updatedState().globalMomentum().perp() 
+	      std::cout << "Trajectory # " << j << " (pT="<<(*jter)->lastMeasurement().updatedState().globalMomentum().perp() 
 				<< " GeV) rejected because it has too low pt";
 	    }
 	  }
@@ -138,13 +138,13 @@ void MuonTrajectoryCleaner::clean(TrajectoryContainer& trajC, edm::Event& event)
 	      skipnext=true;
 	      seedmap[j].insert(seedmap[j].end(), seedmap[i].begin(), seedmap[i].end());
 	      seedmap.erase(i);
-	      LogTrace(metname) << "Trajectory # " << i << " (pT="<<(*iter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV) rejected";
+	      std::cout << "Trajectory # " << i << " (pT="<<(*iter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV) rejected";
 	    }
 	    else{
 	      mask[j] = false;
 	      seedmap[i].insert(seedmap[i].end(), seedmap[j].begin(), seedmap[j].end());
 	      seedmap.erase(j);
-	      LogTrace(metname) << "Trajectory # " << j << " (pT="<<(*jter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV) rejected";
+	      std::cout << "Trajectory # " << j << " (pT="<<(*jter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV) rejected";
 	    }
 	  }
 	}
@@ -154,13 +154,13 @@ void MuonTrajectoryCleaner::clean(TrajectoryContainer& trajC, edm::Event& event)
             skipnext=true;
 	    seedmap[j].insert(seedmap[j].end(), seedmap[i].begin(), seedmap[i].end());
 	    seedmap.erase(i);
-	    LogTrace(metname) << "Trajectory # " << i << " (pT="<<(*iter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV) rejected";
+	    std::cout << "Trajectory # " << i << " (pT="<<(*iter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV) rejected";
           }
           else { 
 	    mask[j] = false;
 	    seedmap[i].insert(seedmap[i].end(), seedmap[j].begin(), seedmap[j].end());
 	    seedmap.erase(j);
-	    LogTrace(metname) << "Trajectory # " << j << " (pT="<<(*jter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV) rejected";
+	    std::cout << "Trajectory # " << j << " (pT="<<(*jter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV) rejected";
 	  }
         } 
       }
@@ -174,7 +174,7 @@ void MuonTrajectoryCleaner::clean(TrajectoryContainer& trajC, edm::Event& event)
 
   // Association map between the seed of the chosen trajectory and the seeds of the discarded trajectories
   if(reportGhosts_) {
-    LogTrace(metname) << " Creating map between chosen seed and ghost seeds." << std::endl;
+    std::cout << " Creating map between chosen seed and ghost seeds." << std::endl;
 
     auto_ptr<L2SeedAssoc> seedToSeedsMap(new L2SeedAssoc);
     int seedcnt(0);
@@ -199,7 +199,7 @@ void MuonTrajectoryCleaner::clean(TrajectoryContainer& trajC, edm::Event& event)
   for ( iter = trajC.begin(); iter != trajC.end(); iter++ ) {
     if ( mask[i] ){
       result.push_back(*iter);
-      LogTrace(metname) << "Keep trajectory with pT = " << (*iter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV";
+      std::cout << "Keep trajectory with pT = " << (*iter)->lastMeasurement().updatedState().globalMomentum().perp() << " GeV";
     }
     else delete *iter;
     i++;
@@ -215,7 +215,7 @@ void MuonTrajectoryCleaner::clean(TrajectoryContainer& trajC, edm::Event& event)
 void MuonTrajectoryCleaner::clean(CandidateContainer& candC){ 
   const std::string metname = "Muon|RecoMuon|MuonTrajectoryCleaner";
 
-  LogTrace(metname) << "Muon Trajectory Cleaner called" << endl;
+  std::cout << "Muon Trajectory Cleaner called" << endl;
 
   if ( candC.size() < 2 ) return;
 
@@ -226,7 +226,7 @@ void MuonTrajectoryCleaner::clean(CandidateContainer& candC){
   const float deltaPhi = 0.01;
   const float deltaPt  = 1.0;
   
-  LogTrace(metname) << "Number of muon candidates in the container: " <<candC.size()<< endl;
+  std::cout << "Number of muon candidates in the container: " <<candC.size()<< endl;
 
   int i(0), j(0);
   int match(0);
@@ -270,7 +270,7 @@ void MuonTrajectoryCleaner::clean(CandidateContainer& candC){
         }
       }
       
-      LogTrace(metname) 
+      std::cout 
 	<< " MuonTrajectoryCleaner: candC " << i << " chi2/nRH = " 
 	<< (*iter)->trajectory()->chiSquared() << "/" << (*iter)->trajectory()->foundHits() <<
 	" vs trajC " << j << " chi2/nRH = " << (*jter)->trajectory()->chiSquared() <<
@@ -294,7 +294,7 @@ void MuonTrajectoryCleaner::clean(CandidateContainer& candC){
       float dpt(fabs(pt1-pt2));
       if ( dpt < deltaPt && deta < deltaEta && dphi < deltaPhi ) {
 	//UNUSED:        directionMatch = true;
-        LogTrace(metname)
+        std::cout
         << " MuonTrajectoryCleaner: candC " << i<<" and "<<j<< " direction matched: "
         <<innerTSOS.globalMomentum()<<" and " <<innerTSOS2.globalMomentum();
       }

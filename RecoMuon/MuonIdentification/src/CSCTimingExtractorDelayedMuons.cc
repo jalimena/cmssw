@@ -257,6 +257,7 @@ CSCTimingExtractorDelayedMuons::fillTiming(TimeMeasurementSequence &tmSequence, 
     tmSequence.weightInvbeta.push_back(hitWeightInvbeta.at(i));
     tmSequence.weightVertex.push_back(hitWeightVertex.at(i));
     tmSequence.hitChisq.push_back(-999.);
+    tmSequence.correctedTime.push_back(dsegm.at(i));
   }
 
   tmSequence.totalWeightInvbeta=totalWeightInvbeta;

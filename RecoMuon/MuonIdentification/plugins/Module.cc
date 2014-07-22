@@ -8,6 +8,7 @@
 #include "RecoMuon/MuonIdentification/plugins/MuonRefProducer.h"
 #include "RecoMuon/MuonIdentification/plugins/MuonProducer.h"
 #include "RecoMuon/MuonIdentification/plugins/MuonTimingProducer.h"
+#include "RecoMuon/MuonIdentification/plugins/MuonTimingProducerDelayedMuons.h"
 #include "RecoMuon/MuonIdentification/plugins/MuonSelectionTypeValueMapProducer.h"
 #include "RecoMuon/MuonIdentification/plugins/InterestingEcalDetIdProducer.h"
 
@@ -18,5 +19,6 @@ DEFINE_FWK_MODULE(MuonLinksProducerForHLT);
 DEFINE_FWK_MODULE(MuonRefProducer);
 DEFINE_FWK_MODULE(MuonProducer);
 DEFINE_FWK_MODULE(MuonTimingProducer);
+DEFINE_FWK_MODULE(MuonTimingProducerDelayedMuons);
 DEFINE_FWK_MODULE(MuonSelectionTypeValueMapProducer);
 DEFINE_FWK_MODULE(InterestingEcalDetIdProducer);

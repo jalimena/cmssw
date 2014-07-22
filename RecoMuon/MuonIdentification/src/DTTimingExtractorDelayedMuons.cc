@@ -603,6 +603,7 @@ DTTimingExtractorDelayedMuons::fillTiming(TimeMeasurementSequence &tmSequence, r
     //tmSequence.superlayer.push_back(superlayer.at(i));
     //tmSequence.layer.push_back(layer.at(i));
   }
+  if(debug) std::cout<<"finished loop over hits"<<std::endl;
 
   tmSequence.totalWeightInvbeta=totalWeightInvbeta;
   tmSequence.totalWeightVertex=totalWeightVertex;
@@ -623,6 +624,7 @@ DTTimingExtractorDelayedMuons::fillTiming(TimeMeasurementSequence &tmSequence, r
     tmSequence.aveHitTimeError=-999.;
   }
 
+  if(debug) std::cout<<"finished fillTiming"<<std::endl;
 }
 
 double

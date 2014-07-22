@@ -75,6 +75,8 @@
 #include <TLegend.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <TTree.h>
+#include <TClass.h>
 #include <TFrame.h>
 
 //
@@ -98,9 +100,11 @@ MuonTimingValidatorDelayedMuons::MuonTimingValidatorDelayedMuons(const edm::Para
   theDtCut(iConfig.getParameter<int>("DTcut")),
   theCscCut(iConfig.getParameter<int>("CSCcut")),
   theDtChambersCut(iConfig.getParameter<int>("DTChambersCut")),
-  theNBins(iConfig.getParameter<int>("nbins"))
+  theNBins(iConfig.getParameter<int>("nbins")),
+  tree(0)
 {
   //now do what ever initialization is needed
+
 }
 
 
@@ -147,18 +151,20 @@ MuonTimingValidatorDelayedMuons::analyze(const edm::Event& iEvent, const edm::Ev
 
   reco::MuonCollection::const_iterator imuon;
   
-  bool debug=false;
+  //bool debug=false;
+  bool debug=true;
 
-  int imucount=0;
-  int igoodmucount=0;
-  for(imuon = muonC.begin(); imuon != muonC.end(); ++imuon){
+  int imucount = 0;
+  int igoodmucount = 0;
+
+  if(MuCollection.isValid() &&TKTrackCollection.isValid()){
+      for(imuon = muonC.begin(); imuon != muonC.end(); ++imuon){
     
     //debug=false;
     debug=true;
     // if (imuon->pt()>100 && imuon->isGlobalMuon()) debug=true;
     
-    //if (debug)
-    //std::cout << " Event: " << iEvent.id() << " Found muon. Pt: " << imuon->p() << std::endl;
+    if (debug) std::cout << " Event: " << iEvent.id() << " Found muon. Pt: " << imuon->pt() << std::endl;
     
     if ((fabs(imuon->eta())<theMinEta) || (fabs(imuon->eta())>theMaxEta)) continue;
     
@@ -167,6 +173,7 @@ MuonTimingValidatorDelayedMuons::analyze(const edm::Event& iEvent, const edm::Ev
       hi_tk_pt->Fill(((*trkTrack).pt()));
       hi_tk_phi->Fill(((*trkTrack).phi()));
       hi_tk_eta->Fill(((*trkTrack).eta()));
+      if (debug) std::cout << " Tracker track Pt: " << (*trkTrack).pt() << std::endl;
     }  
 
     //reco::TrackRef staTrack = imuon->standAloneMuon();
@@ -182,10 +189,9 @@ MuonTimingValidatorDelayedMuons::analyze(const edm::Event& iEvent, const edm::Ev
       hi_glb_phi->Fill((*glbTrack).phi());
       hi_glb_eta->Fill((*glbTrack).eta()); 
       
-      //if (debug)
-      //std::cout << " Global Pt: " << (*glbTrack).pt() << std::endl;
+      if (debug) std::cout << " Global Pt: " << (*glbTrack).pt() << std::endl;
     }
-
+    
     // Analyze the short info stored directly in reco::Muon
     
     reco::MuonTime muonTime;
@@ -248,10 +254,11 @@ MuonTimingValidatorDelayedMuons::analyze(const edm::Event& iEvent, const edm::Ev
     //std::cout << "          DT Time: " << timedt.timeAtIpInOut() << " +/- " << timedt.inverseBetaErr() << std::endl;
     //std::cout << "         DT FreeB: " << timedt.freeInverseBeta() << " +/- " << timedt.freeInverseBetaErr() << std::endl;
     //}
-      
+
+
     reco::TrackRef staTrack = imuon->standAloneMuon();
-    if (staTrack.isNonnull()) {
-      if((*staTrack).pt()>thePtCut){
+    if(staTrack.isNonnull()){
+    if((*staTrack).pt()>thePtCut){
 	if (timedt.nDof()>theDtCut) {
 	  if((*staTrack).hitPattern().dtStationsWithValidHits()>theDtChambersCut){
 	      
@@ -259,8 +266,8 @@ MuonTimingValidatorDelayedMuons::analyze(const edm::Event& iEvent, const edm::Ev
 	  //if((*staTrack).phi()>0.){
 	    //if(timedt.invbetaLS()<1.1 && timedt.invbetaLS()>0.9){
 	      //std::cout << " Event: " << iEvent.id() << "  Run: "<< iEvent.run()<<std::endl;
-	  igoodmucount++;
-
+	    igoodmucount++;
+	    
 	  if (debug) {
 	    std::cout << "          DT nDof: " << timedt.nDof() << std::endl;
 	    std::cout << "          DT Time: " << timedt.timeAtIpInOut() << " +/- " << timedt.inverseBetaErr() << std::endl;
@@ -529,13 +536,150 @@ MuonTimingValidatorDelayedMuons::analyze(const edm::Event& iEvent, const edm::Ev
 	    if (muonE.hadMax>0.25) hi_dthcal_vtx->Fill(timedt.timeAtIpInOut()-muonE.hcal_time);
 	  }    
 
+	  //fill tree variables
+	  LocalT0_0 = timedt.localT00();
+	  LocalT0_1 = timedt.localT01();
+	  LocalT0_2 = timedt.localT02();
+	  LocalT0_3 = timedt.localT03();
+	  LocalT0_4 = timedt.localT04();
+	  LocalT0_5 = timedt.localT05();
+	  LocalT0_6 = timedt.localT06();
+	  LocalT0_7 = timedt.localT07();
+	  LocalT0_8 = timedt.localT08();
+	  LocalT0_9 = timedt.localT09();
+	  LocalT0_10 = timedt.localT010();
+	  LocalT0_11 = timedt.localT011();
+	  LocalT0_12 = timedt.localT012();
+	  LocalT0_13 = timedt.localT013();
+	  LocalT0_14 = timedt.localT014();
+	  LocalT0_15 = timedt.localT015();
+	  LocalT0_16 = timedt.localT016();
+	  LocalT0_17 = timedt.localT017();
+	  LocalT0_18 = timedt.localT018();
+	  LocalT0_19 = timedt.localT019();
+	  LocalT0_20 = timedt.localT020();
+	  LocalT0_21 = timedt.localT021();
+	  LocalT0_22 = timedt.localT022();
+	  LocalT0_23 = timedt.localT023();
+	  LocalT0_24 = timedt.localT024();
+	  LocalT0_25 = timedt.localT025();
+	  LocalT0_26 = timedt.localT026();
+	  LocalT0_27 = timedt.localT027();
+	  LocalT0_28 = timedt.localT028();
+	  LocalT0_29 = timedt.localT029();
+	  LocalT0_30 = timedt.localT030();
+	  LocalT0_31 = timedt.localT031();
+	  
+	  CorrectedTime_0 = timedt.correctedTime0();
+	  CorrectedTime_1 = timedt.correctedTime1();
+	  CorrectedTime_2 = timedt.correctedTime2();
+	  CorrectedTime_3 = timedt.correctedTime3();
+	  CorrectedTime_4 = timedt.correctedTime4();
+	  CorrectedTime_5 = timedt.correctedTime5();
+	  CorrectedTime_6 = timedt.correctedTime6();
+	  CorrectedTime_7 = timedt.correctedTime7();
+	  CorrectedTime_8 = timedt.correctedTime8();
+	  CorrectedTime_9 = timedt.correctedTime9();
+	  CorrectedTime_10 = timedt.correctedTime10();
+	  CorrectedTime_11 = timedt.correctedTime11();
+	  CorrectedTime_12 = timedt.correctedTime12();
+	  CorrectedTime_13 = timedt.correctedTime13();
+	  CorrectedTime_14 = timedt.correctedTime14();
+	  CorrectedTime_15 = timedt.correctedTime15();
+	  CorrectedTime_16 = timedt.correctedTime16();
+	  CorrectedTime_17 = timedt.correctedTime17();
+	  CorrectedTime_18 = timedt.correctedTime18();
+	  CorrectedTime_19 = timedt.correctedTime19();
+	  CorrectedTime_20 = timedt.correctedTime20();
+	  CorrectedTime_21 = timedt.correctedTime21();
+	  CorrectedTime_22 = timedt.correctedTime22();
+	  CorrectedTime_23 = timedt.correctedTime23();
+	  CorrectedTime_24 = timedt.correctedTime24();
+	  CorrectedTime_25 = timedt.correctedTime25();
+	  CorrectedTime_26 = timedt.correctedTime26();
+	  CorrectedTime_27 = timedt.correctedTime27();
+	  CorrectedTime_28 = timedt.correctedTime28();
+	  CorrectedTime_29 = timedt.correctedTime29();
+	  CorrectedTime_30 = timedt.correctedTime30();
+	  CorrectedTime_31 = timedt.correctedTime31();
+	  
+	  Distance_0 = timedt.distance0();
+	  Distance_1 = timedt.distance1();
+	  Distance_2 = timedt.distance2();
+	  Distance_3 = timedt.distance3();
+	  Distance_4 = timedt.distance4();
+	  Distance_5 = timedt.distance5();
+	  Distance_6 = timedt.distance6();
+	  Distance_7 = timedt.distance7();
+	  Distance_8 = timedt.distance8();
+	  Distance_9 = timedt.distance9();
+	  Distance_10 = timedt.distance10();
+	  Distance_11 = timedt.distance11();
+	  Distance_12 = timedt.distance12();
+	  Distance_13 = timedt.distance13();
+	  Distance_14 = timedt.distance14();
+	  Distance_15 = timedt.distance15();
+	  Distance_16 = timedt.distance16();
+	  Distance_17 = timedt.distance17();
+	  Distance_18 = timedt.distance18();
+	  Distance_19 = timedt.distance19();
+	  Distance_20 = timedt.distance20();
+	  Distance_21 = timedt.distance21();
+	  Distance_22 = timedt.distance22();
+	  Distance_23 = timedt.distance23();
+	  Distance_24 = timedt.distance24();
+	  Distance_25 = timedt.distance25();
+	  Distance_26 = timedt.distance26();
+	  Distance_27 = timedt.distance27();
+	  Distance_28 = timedt.distance28();
+	  Distance_29 = timedt.distance29();
+	  Distance_30 = timedt.distance30();
+	  Distance_31 = timedt.distance31();
+	  
+	  HitChisq_0 = timedt.hitChisq0();
+	  HitChisq_1 = timedt.hitChisq1();
+	  HitChisq_2 = timedt.hitChisq2();
+	  HitChisq_3 = timedt.hitChisq3();
+	  HitChisq_4 = timedt.hitChisq4();
+	  HitChisq_5 = timedt.hitChisq5();
+	  HitChisq_6 = timedt.hitChisq6();
+	  HitChisq_7 = timedt.hitChisq7();
+	  HitChisq_8 = timedt.hitChisq8();
+	  HitChisq_9 = timedt.hitChisq9();
+	  HitChisq_10 = timedt.hitChisq10();
+	  HitChisq_11 = timedt.hitChisq11();
+	  HitChisq_12 = timedt.hitChisq12();
+	  HitChisq_13 = timedt.hitChisq13();
+	  HitChisq_14 = timedt.hitChisq14();
+	  HitChisq_15 = timedt.hitChisq15();
+	  HitChisq_16 = timedt.hitChisq16();
+	  HitChisq_17 = timedt.hitChisq17();
+	  HitChisq_18 = timedt.hitChisq18();
+	  HitChisq_19 = timedt.hitChisq19();
+	  HitChisq_20 = timedt.hitChisq20();
+	  HitChisq_21 = timedt.hitChisq21();
+	  HitChisq_22 = timedt.hitChisq22();
+	  HitChisq_23 = timedt.hitChisq23();
+	  HitChisq_24 = timedt.hitChisq24();
+	  HitChisq_25 = timedt.hitChisq25();
+	  HitChisq_26 = timedt.hitChisq26();
+	  HitChisq_27 = timedt.hitChisq27();
+	  HitChisq_28 = timedt.hitChisq28();
+	  HitChisq_29 = timedt.hitChisq29();
+	  HitChisq_30 = timedt.hitChisq30();
+	  HitChisq_31 = timedt.hitChisq31();
+	  
+
+	  //only fill tree for first good muon
+	  if(igoodmucount==1) tree->Fill();
+
 	  }//end of number of DT chambers cut
 	  //}//end of invbetaLS cut	 
 	  //}//end of phi cut
 	}//end of if sufficient DT DOF       
-      }// end of pt cut
-    }//end of if sta track exists
-
+    }// end of pt cut
+      }//end of if sta track exists
+    
 
     if (timecsc.nDof()>theCscCut) {
       //if (debug) {
@@ -595,9 +739,12 @@ MuonTimingValidatorDelayedMuons::analyze(const edm::Event& iEvent, const edm::Ev
     }
 
     imucount++;
-  }//end of loop over muons
-
-  if(igoodmucount>0) hi_dt_nmuons->Fill(igoodmucount);
+      }//end of loop over muons
+      
+      if(igoodmucount>0) hi_dt_nmuons->Fill(igoodmucount);
+  }
+  
+  
 }
 
 
@@ -707,36 +854,171 @@ MuonTimingValidatorDelayedMuons::beginJob()
   dttime_localT0_hitChisq_LowInversebetaLS = new TH2F("dttime_localT0_hitChisq_LowInversebetaLS","Time vs Hit Chisq",800,-100,100,1000,0,100);
   
   hi_csctime_ibt = new TH1F("hi_csctime_ibt","CSC Inverse Beta",theNBins,0.,1.6);
-   hi_csctime_ibt_pt = new TH2F("hi_csctime_ibt_pt","P{T} vs CSC Inverse Beta",theNBins,0.0,theMaxPtres,theNBins,0.7,2.0);
-   hi_csctime_ibt_err = new TH1F("hi_csctime_ibt_err","CSC Inverse Beta Error",theNBins,0.,1.0);
-   hi_csctime_fib = new TH1F("hi_csctime_fib","CSC Free Inverse Beta",theNBins,-5.*theScale,7.*theScale);
-   hi_csctime_fib_err = new TH1F("hi_csctime_fib_err","CSC Free Inverse Beta Error",theNBins,0,5.);
-   hi_csctime_vtx = new TH1F("hi_csctime_vtx","CSC Time at Vertex (inout)",theNBins,-25.*theScale,25.*theScale);
-   hi_csctime_vtx_err = new TH1F("hi_csctime_vtx_err","CSC Time at Vertex Error (inout)",theNBins,0.,25.0);
-   hi_csctime_vtxr = new TH1F("hi_csctime_vtxR","CSC Time at Vertex (inout)",theNBins,0.,75.*theScale);
-   hi_csctime_vtxr_err = new TH1F("hi_csctime_vtxR_err","CSC Time at Vertex Error (inout)",theNBins,0.,25.0);
-   hi_csctime_ibt_pull = new TH1F("hi_csctime_ibt_pull","CSC Inverse Beta Pull",theNBins,-5.,5.0);
-   hi_csctime_fib_pull = new TH1F("hi_csctime_fib_pull","CSC Free Inverse Beta Pull",theNBins,-5.,5.0);
-   hi_csctime_vtx_pull = new TH1F("hi_csctime_vtx_pull","CSC Time at Vertex Pull (inout)",theNBins,-5.,5.0);
-   hi_csctime_vtxr_pull = new TH1F("hi_csctime_vtxR_pull","CSC Time at Vertex Pull (inout)",theNBins,-5.,5.0);
+  hi_csctime_ibt_pt = new TH2F("hi_csctime_ibt_pt","P{T} vs CSC Inverse Beta",theNBins,0.0,theMaxPtres,theNBins,0.7,2.0);
+  hi_csctime_ibt_err = new TH1F("hi_csctime_ibt_err","CSC Inverse Beta Error",theNBins,0.,1.0);
+  hi_csctime_fib = new TH1F("hi_csctime_fib","CSC Free Inverse Beta",theNBins,-5.*theScale,7.*theScale);
+  hi_csctime_fib_err = new TH1F("hi_csctime_fib_err","CSC Free Inverse Beta Error",theNBins,0,5.);
+  hi_csctime_vtx = new TH1F("hi_csctime_vtx","CSC Time at Vertex (inout)",theNBins,-25.*theScale,25.*theScale);
+  hi_csctime_vtx_err = new TH1F("hi_csctime_vtx_err","CSC Time at Vertex Error (inout)",theNBins,0.,25.0);
+  hi_csctime_vtxr = new TH1F("hi_csctime_vtxR","CSC Time at Vertex (inout)",theNBins,0.,75.*theScale);
+  hi_csctime_vtxr_err = new TH1F("hi_csctime_vtxR_err","CSC Time at Vertex Error (inout)",theNBins,0.,25.0);
+  hi_csctime_ibt_pull = new TH1F("hi_csctime_ibt_pull","CSC Inverse Beta Pull",theNBins,-5.,5.0);
+  hi_csctime_fib_pull = new TH1F("hi_csctime_fib_pull","CSC Free Inverse Beta Pull",theNBins,-5.,5.0);
+  hi_csctime_vtx_pull = new TH1F("hi_csctime_vtx_pull","CSC Time at Vertex Pull (inout)",theNBins,-5.,5.0);
+  hi_csctime_vtxr_pull = new TH1F("hi_csctime_vtxR_pull","CSC Time at Vertex Pull (inout)",theNBins,-5.,5.0);
+  
+  hi_csctime_ndof = new TH1F("hi_csctime_ndof","Number of CSC timing measurements",48,0.,48.0);
+  
+  hi_ecal_time = new TH1F("hi_ecal_time","ECAL Time at Vertex (inout)",theNBins,-40.*theScale,40.*theScale);
+  hi_ecal_time_err = new TH1F("hi_ecal_time_err","ECAL Time at Vertex Error",theNBins,0.,20.0);
+  hi_ecal_time_pull = new TH1F("hi_ecal_time_pull","ECAL Time at Vertex Pull",theNBins,-7.0,7.0);
+  hi_ecal_time_ecut = new TH1F("hi_ecal_time_ecut","ECAL Time at Vertex (inout) after energy cut",theNBins,-20.*theScale,20.*theScale);
+  hi_ecal_energy = new TH1F("hi_ecal_energy","ECAL max energy in 5x5 crystals",theNBins,.0,5.0);
 
-   hi_csctime_ndof = new TH1F("hi_csctime_ndof","Number of CSC timing measurements",48,0.,48.0);
+  hi_hcal_time = new TH1F("hi_hcal_time","HCAL Time at Vertex (inout)",theNBins,-40.*theScale,40.*theScale);
+  hi_hcal_time_err = new TH1F("hi_hcal_time_err","HCAL Time at Vertex Error",theNBins,0.,20.0);
+  hi_hcal_time_pull = new TH1F("hi_hcal_time_pull","HCAL Time at Vertex Pull",theNBins,-7.0,7.0);
+  hi_hcal_time_ecut = new TH1F("hi_hcal_time_ecut","HCAL Time at Vertex (inout) after energy cut",theNBins,-20.*theScale,20.*theScale);
+  hi_hcal_energy = new TH1F("hi_hcal_energy","HCAL max energy in 5x5 crystals",theNBins,.0,5.0);
+  
+  hi_sta_eta = new TH1F("hi_sta_eta","#eta^{STA}",theNBins,-1.*theMaxEta,theMaxEta);
+  hi_tk_eta  = new TH1F("hi_tk_eta","#eta^{TK}",theNBins,-1.*theMaxEta,theMaxEta);
+  hi_glb_eta = new TH1F("hi_glb_eta","#eta^{GLB}",theNBins,-1.*theMaxEta,theMaxEta);
 
-   hi_ecal_time = new TH1F("hi_ecal_time","ECAL Time at Vertex (inout)",theNBins,-40.*theScale,40.*theScale);
-   hi_ecal_time_err = new TH1F("hi_ecal_time_err","ECAL Time at Vertex Error",theNBins,0.,20.0);
-   hi_ecal_time_pull = new TH1F("hi_ecal_time_pull","ECAL Time at Vertex Pull",theNBins,-7.0,7.0);
-   hi_ecal_time_ecut = new TH1F("hi_ecal_time_ecut","ECAL Time at Vertex (inout) after energy cut",theNBins,-20.*theScale,20.*theScale);
-   hi_ecal_energy = new TH1F("hi_ecal_energy","ECAL max energy in 5x5 crystals",theNBins,.0,5.0);
+  // tree
+  tree = new TTree("tree","tree");
+  tree->Branch("HitChisq_0",&HitChisq_0,"HitChisq0/D");
+  tree->Branch("HitChisq_1",&HitChisq_1,"HitChisq1/D");
+  tree->Branch("HitChisq_2",&HitChisq_2,"HitChisq2/D");
+  tree->Branch("HitChisq_3",&HitChisq_3,"HitChisq3/D");
+  tree->Branch("HitChisq_4",&HitChisq_4,"HitChisq4/D");
+  tree->Branch("HitChisq_5",&HitChisq_5,"HitChisq5/D");
+  tree->Branch("HitChisq_6",&HitChisq_6,"HitChisq6/D");
+  tree->Branch("HitChisq_7",&HitChisq_7,"HitChisq7/D");
+  tree->Branch("HitChisq_8",&HitChisq_8,"HitChisq8/D");
+  tree->Branch("HitChisq_9",&HitChisq_9,"HitChisq9/D");
+  tree->Branch("HitChisq_10",&HitChisq_10,"HitChisq10/D");
+  tree->Branch("HitChisq_11",&HitChisq_11,"HitChisq11/D");
+  tree->Branch("HitChisq_12",&HitChisq_12,"HitChisq12/D");
+  tree->Branch("HitChisq_13",&HitChisq_13,"HitChisq13/D");
+  tree->Branch("HitChisq_14",&HitChisq_14,"HitChisq14/D");
+  tree->Branch("HitChisq_15",&HitChisq_15,"HitChisq15/D");
+  tree->Branch("HitChisq_16",&HitChisq_16,"HitChisq16/D");
+  tree->Branch("HitChisq_17",&HitChisq_17,"HitChisq17/D");
+  tree->Branch("HitChisq_18",&HitChisq_18,"HitChisq18/D");
+  tree->Branch("HitChisq_19",&HitChisq_19,"HitChisq19/D");
+  tree->Branch("HitChisq_20",&HitChisq_20,"HitChisq20/D");
+  tree->Branch("HitChisq_21",&HitChisq_21,"HitChisq21/D");
+  tree->Branch("HitChisq_22",&HitChisq_22,"HitChisq22/D");
+  tree->Branch("HitChisq_23",&HitChisq_23,"HitChisq23/D");
+  tree->Branch("HitChisq_24",&HitChisq_24,"HitChisq24/D");
+  tree->Branch("HitChisq_25",&HitChisq_25,"HitChisq25/D");
+  tree->Branch("HitChisq_26",&HitChisq_26,"HitChisq26/D");
+  tree->Branch("HitChisq_27",&HitChisq_27,"HitChisq27/D");
+  tree->Branch("HitChisq_28",&HitChisq_28,"HitChisq28/D");
+  tree->Branch("HitChisq_29",&HitChisq_29,"HitChisq29/D");
+  tree->Branch("HitChisq_30",&HitChisq_30,"HitChisq30/D");
+  tree->Branch("HitChisq_31",&HitChisq_31,"HitChisq31/D");
 
-   hi_hcal_time = new TH1F("hi_hcal_time","HCAL Time at Vertex (inout)",theNBins,-40.*theScale,40.*theScale);
-   hi_hcal_time_err = new TH1F("hi_hcal_time_err","HCAL Time at Vertex Error",theNBins,0.,20.0);
-   hi_hcal_time_pull = new TH1F("hi_hcal_time_pull","HCAL Time at Vertex Pull",theNBins,-7.0,7.0);
-   hi_hcal_time_ecut = new TH1F("hi_hcal_time_ecut","HCAL Time at Vertex (inout) after energy cut",theNBins,-20.*theScale,20.*theScale);
-   hi_hcal_energy = new TH1F("hi_hcal_energy","HCAL max energy in 5x5 crystals",theNBins,.0,5.0);
+  tree->Branch("LocalT0_0",&LocalT0_0,"LocalT00/D");
+  tree->Branch("LocalT0_1",&LocalT0_1,"LocalT01/D");
+  tree->Branch("LocalT0_2",&LocalT0_2,"LocalT02/D");
+  tree->Branch("LocalT0_3",&LocalT0_3,"LocalT03/D");
+  tree->Branch("LocalT0_4",&LocalT0_4,"LocalT04/D");
+  tree->Branch("LocalT0_5",&LocalT0_5,"LocalT05/D");
+  tree->Branch("LocalT0_6",&LocalT0_6,"LocalT06/D");
+  tree->Branch("LocalT0_7",&LocalT0_7,"LocalT07/D");
+  tree->Branch("LocalT0_8",&LocalT0_8,"LocalT08/D");
+  tree->Branch("LocalT0_9",&LocalT0_9,"LocalT09/D");
+  tree->Branch("LocalT0_10",&LocalT0_10,"LocalT010/D");
+  tree->Branch("LocalT0_11",&LocalT0_11,"LocalT011/D");
+  tree->Branch("LocalT0_12",&LocalT0_12,"LocalT012/D");
+  tree->Branch("LocalT0_13",&LocalT0_13,"LocalT013/D");
+  tree->Branch("LocalT0_14",&LocalT0_14,"LocalT014/D");
+  tree->Branch("LocalT0_15",&LocalT0_15,"LocalT015/D");
+  tree->Branch("LocalT0_16",&LocalT0_16,"LocalT016/D");
+  tree->Branch("LocalT0_17",&LocalT0_17,"LocalT017/D");
+  tree->Branch("LocalT0_18",&LocalT0_18,"LocalT018/D");
+  tree->Branch("LocalT0_19",&LocalT0_19,"LocalT019/D");
+  tree->Branch("LocalT0_20",&LocalT0_20,"LocalT020/D");
+  tree->Branch("LocalT0_21",&LocalT0_21,"LocalT021/D");
+  tree->Branch("LocalT0_22",&LocalT0_22,"LocalT022/D");
+  tree->Branch("LocalT0_23",&LocalT0_23,"LocalT023/D");
+  tree->Branch("LocalT0_24",&LocalT0_24,"LocalT024/D");
+  tree->Branch("LocalT0_25",&LocalT0_25,"LocalT025/D");
+  tree->Branch("LocalT0_26",&LocalT0_26,"LocalT026/D");
+  tree->Branch("LocalT0_27",&LocalT0_27,"LocalT027/D");
+  tree->Branch("LocalT0_28",&LocalT0_28,"LocalT028/D");
+  tree->Branch("LocalT0_29",&LocalT0_29,"LocalT029/D");
+  tree->Branch("LocalT0_30",&LocalT0_30,"LocalT030/D");
+  tree->Branch("LocalT0_31",&LocalT0_31,"LocalT031/D");
 
-   hi_sta_eta = new TH1F("hi_sta_eta","#eta^{STA}",theNBins,-1.*theMaxEta,theMaxEta);
-   hi_tk_eta  = new TH1F("hi_tk_eta","#eta^{TK}",theNBins,-1.*theMaxEta,theMaxEta);
-   hi_glb_eta = new TH1F("hi_glb_eta","#eta^{GLB}",theNBins,-1.*theMaxEta,theMaxEta);
+  tree->Branch("CorrectedTime_0",&CorrectedTime_0,"CorrectedTime0/D");
+  tree->Branch("CorrectedTime_1",&CorrectedTime_1,"CorrectedTime1/D");
+  tree->Branch("CorrectedTime_2",&CorrectedTime_2,"CorrectedTime2/D");
+  tree->Branch("CorrectedTime_3",&CorrectedTime_3,"CorrectedTime3/D");
+  tree->Branch("CorrectedTime_4",&CorrectedTime_4,"CorrectedTime4/D");
+  tree->Branch("CorrectedTime_5",&CorrectedTime_5,"CorrectedTime5/D");
+  tree->Branch("CorrectedTime_6",&CorrectedTime_6,"CorrectedTime6/D");
+  tree->Branch("CorrectedTime_7",&CorrectedTime_7,"CorrectedTime7/D");
+  tree->Branch("CorrectedTime_8",&CorrectedTime_8,"CorrectedTime8/D");
+  tree->Branch("CorrectedTime_9",&CorrectedTime_9,"CorrectedTime9/D");
+  tree->Branch("CorrectedTime_10",&CorrectedTime_10,"CorrectedTime10/D");
+  tree->Branch("CorrectedTime_11",&CorrectedTime_11,"CorrectedTime11/D");
+  tree->Branch("CorrectedTime_12",&CorrectedTime_12,"CorrectedTime12/D");
+  tree->Branch("CorrectedTime_13",&CorrectedTime_13,"CorrectedTime13/D");
+  tree->Branch("CorrectedTime_14",&CorrectedTime_14,"CorrectedTime14/D");
+  tree->Branch("CorrectedTime_15",&CorrectedTime_15,"CorrectedTime15/D");
+  tree->Branch("CorrectedTime_16",&CorrectedTime_16,"CorrectedTime16/D");
+  tree->Branch("CorrectedTime_17",&CorrectedTime_17,"CorrectedTime17/D");
+  tree->Branch("CorrectedTime_18",&CorrectedTime_18,"CorrectedTime18/D");
+  tree->Branch("CorrectedTime_19",&CorrectedTime_19,"CorrectedTime19/D");
+  tree->Branch("CorrectedTime_20",&CorrectedTime_20,"CorrectedTime20/D");
+  tree->Branch("CorrectedTime_21",&CorrectedTime_21,"CorrectedTime21/D");
+  tree->Branch("CorrectedTime_22",&CorrectedTime_22,"CorrectedTime22/D");
+  tree->Branch("CorrectedTime_23",&CorrectedTime_23,"CorrectedTime23/D");
+  tree->Branch("CorrectedTime_24",&CorrectedTime_24,"CorrectedTime24/D");
+  tree->Branch("CorrectedTime_25",&CorrectedTime_25,"CorrectedTime25/D");
+  tree->Branch("CorrectedTime_26",&CorrectedTime_26,"CorrectedTime26/D");
+  tree->Branch("CorrectedTime_27",&CorrectedTime_27,"CorrectedTime27/D");
+  tree->Branch("CorrectedTime_28",&CorrectedTime_28,"CorrectedTime28/D");
+  tree->Branch("CorrectedTime_29",&CorrectedTime_29,"CorrectedTime29/D");
+  tree->Branch("CorrectedTime_30",&CorrectedTime_30,"CorrectedTime30/D");
+  tree->Branch("CorrectedTime_31",&CorrectedTime_31,"CorrectedTime31/D");
+
+  tree->Branch("Distance_0",&Distance_0,"Distance0/D");
+  tree->Branch("Distance_1",&Distance_1,"Distance1/D");
+  tree->Branch("Distance_2",&Distance_2,"Distance2/D");
+  tree->Branch("Distance_3",&Distance_3,"Distance3/D");
+  tree->Branch("Distance_4",&Distance_4,"Distance4/D");
+  tree->Branch("Distance_5",&Distance_5,"Distance5/D");
+  tree->Branch("Distance_6",&Distance_6,"Distance6/D");
+  tree->Branch("Distance_7",&Distance_7,"Distance7/D");
+  tree->Branch("Distance_8",&Distance_8,"Distance8/D");
+  tree->Branch("Distance_9",&Distance_9,"Distance9/D");
+  tree->Branch("Distance_10",&Distance_10,"Distance10/D");
+  tree->Branch("Distance_11",&Distance_11,"Distance11/D");
+  tree->Branch("Distance_12",&Distance_12,"Distance12/D");
+  tree->Branch("Distance_13",&Distance_13,"Distance13/D");
+  tree->Branch("Distance_14",&Distance_14,"Distance14/D");
+  tree->Branch("Distance_15",&Distance_15,"Distance15/D");
+  tree->Branch("Distance_16",&Distance_16,"Distance16/D");
+  tree->Branch("Distance_17",&Distance_17,"Distance17/D");
+  tree->Branch("Distance_18",&Distance_18,"Distance18/D");
+  tree->Branch("Distance_19",&Distance_19,"Distance19/D");
+  tree->Branch("Distance_20",&Distance_20,"Distance20/D");
+  tree->Branch("Distance_21",&Distance_21,"Distance21/D");
+  tree->Branch("Distance_22",&Distance_22,"Distance22/D");
+  tree->Branch("Distance_23",&Distance_23,"Distance23/D");
+  tree->Branch("Distance_24",&Distance_24,"Distance24/D");
+  tree->Branch("Distance_25",&Distance_25,"Distance25/D");
+  tree->Branch("Distance_26",&Distance_26,"Distance26/D");
+  tree->Branch("Distance_27",&Distance_27,"Distance27/D");
+  tree->Branch("Distance_28",&Distance_28,"Distance28/D");
+  tree->Branch("Distance_29",&Distance_29,"Distance29/D");
+  tree->Branch("Distance_30",&Distance_30,"Distance30/D");
+  tree->Branch("Distance_31",&Distance_31,"Distance31/D");
+
 
 }
 
@@ -876,6 +1158,7 @@ MuonTimingValidatorDelayedMuons::endJob() {
   hi_hcal_time_pull->Write();
   hi_hcal_energy->Write();
 
+  tree->Write();
   hFile->Write();
 
   //write out percentage of events that pass chi-squared cuts to text file

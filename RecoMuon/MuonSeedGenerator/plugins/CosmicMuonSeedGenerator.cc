@@ -351,14 +351,20 @@ std::vector<TrajectorySeed> CosmicMuonSeedGenerator::createSeed(const MuonRecHit
   TrajectoryStateOnSurface tsos(param, error, hit->det()->surface(), &*theField);
   TrajectoryStateOnSurface tsos2(param2, error, hit->det()->surface(), &*theField);
 
-  LogTrace(category)<<"Trajectory State on Surface of Seed";
-  LogTrace(category)<<"mom: "<<tsos.globalMomentum()<<" phi: "<<tsos.globalMomentum().phi();
-  LogTrace(category)<<"pos: " << tsos.globalPosition(); 
-  LogTrace(category) << "The RecSegment relies on: ";
-  LogTrace(category) << dumper.dumpMuonId(hit->geographicalId());
+  edm::OwnVector<TrackingRecHit> container;
+  container.push_back(*hit);
 
-  result.push_back( tsosToSeed(tsos, hit->geographicalId().rawId()) ); 
-  result.push_back( tsosToSeed(tsos2, hit->geographicalId().rawId()) );
+  result.push_back( tsosToSeed(tsos, hit->geographicalId().rawId(), container) );
+  result.push_back( tsosToSeed(tsos2, hit->geographicalId().rawId(), container) );
+
+  int precision = 3;
+  std::cout << dumper.dumpMuonId(hit->geographicalId());//<<std::endl;                                                                                                                
+  std::cout<<std::setprecision(precision)<<"global position (x,y,z) is: "<<hit->globalPosition()<<"; (eta,phi) is: ("<<hit->globalPosition().eta()<<","<<hit->globalPosition().phi()<<")"<<std::endl;
+  std::cout<<"global direction (x,y,z) is: "<<(hit)->globalDirection()<<"; (eta, phi) is: ("<<(hit)->globalDirection().eta()<<","<<(hit)->globalDirection().phi()<<")"<<std::endl;
+
+  std::cout<<"Trajectory State on Surface of Seed"<<std::endl;
+  std::cout<<"mom: "<<tsos.globalMomentum()<<", eta: "<<tsos.globalMomentum().eta()<<", phi: "<<tsos.globalMomentum().phi()<<std::endl;
+  std::cout<<"pos: " << tsos.globalPosition()<<std::endl;
 
   return result;
 }
@@ -448,7 +454,7 @@ std::vector<TrajectorySeed> CosmicMuonSeedGenerator::createSeed(const CosmicMuon
   
   float dphi = deltaPhi((hitpair.first)->globalDirection().phi(), (hitpair.second)->globalDirection().phi());
 
-  LogTrace(category)<<"hitpair.type "<<hitpair.type; 
+  std::cout<<"hitpair.type "<<hitpair.type; 
 
   map<string, float>::const_iterator iterPar = theParameters.find(hitpair.type);
   if ( iterPar == theParameters.end() ) {
@@ -504,23 +510,34 @@ std::vector<TrajectorySeed> CosmicMuonSeedGenerator::createSeed(const CosmicMuon
   // Create the TrajectoryStateOnSurface
   TrajectoryStateOnSurface tsos(param, error, hit->det()->surface(), &*theField);
 
-  LogTrace(category)<<"Trajectory State on Surface of Seed";
-  LogTrace(category)<<"mom: "<<tsos.globalMomentum()<<" phi: "<<tsos.globalMomentum().phi();
-  LogTrace(category)<<"pos: " << tsos.globalPosition(); 
-  LogTrace(category) << "The RecSegment relies on: ";
-  LogTrace(category) << dumper.dumpMuonId(hit->geographicalId());
+  edm::OwnVector<TrackingRecHit> container;
+  container.push_back( *(hitpair.first) );
+  container.push_back( *(hitpair.second) ); 
 
-  result.push_back( tsosToSeed(tsos, hit->geographicalId().rawId()) );
+  std::cout<<"Trajectory State on Surface of Seed"<<std::endl;
+  std::cout<<"mom: "<<tsos.globalMomentum()<<", eta: "<<tsos.globalMomentum().eta()<<", phi: "<<tsos.globalMomentum().phi()<<std::endl;
+  std::cout<<"pos: " << tsos.globalPosition()<<std::endl;
+  std::cout << "The first seg is: "<<std::endl;
+  std::cout << dumper.dumpMuonId(hitpair.first->geographicalId())<<", pos: "<<hitpair.first->globalPosition()<<std::endl;
+  std::cout << "The second seg is: "<<std::endl;
+  std::cout << dumper.dumpMuonId(hitpair.second->geographicalId())<<", pos: "<<hitpair.second->globalPosition()<<std::endl;
 
-   return result;
+  result.push_back( tsosToSeed(tsos, hit->geographicalId().rawId(), container) );
+  
+  return result;
 }
 
 TrajectorySeed CosmicMuonSeedGenerator::tsosToSeed(const TrajectoryStateOnSurface& tsos, uint32_t id) const {
 
-  PTrajectoryStateOnDet const & seedTSOS = trajectoryStateTransform::persistentState(tsos, id);
-
   edm::OwnVector<TrackingRecHit> container;
+  return tsosToSeed(tsos, id, container);
+}
+
+TrajectorySeed CosmicMuonSeedGenerator::tsosToSeed(const TrajectoryStateOnSurface& tsos, uint32_t id, edm::OwnVector<TrackingRecHit>& container) const {
+
+  PTrajectoryStateOnDet const & seedTSOS = trajectoryStateTransform::persistentState(tsos, id);
   TrajectorySeed seed(seedTSOS,container,alongMomentum);
   return seed;
 }
 
+//  LocalWords:  endl

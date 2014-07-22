@@ -34,7 +34,8 @@ from RecoMuon.MuonIdentification.muonTimingDelayedMuons_cfi import *
 
 process.muonAnalyzer = cms.EDAnalyzer("MuonTimingValidatorDelayedMuons",
                                       TKtracks = cms.untracked.InputTag("generalTracks"),
-                                      STAtracks = cms.untracked.InputTag("standAloneMuons"),
+                                      #STAtracks = cms.untracked.InputTag("standAloneMuons"),
+                                      STAtracks = cms.untracked.InputTag("refittedStandAloneMuons"),
                                       Muons = cms.untracked.InputTag("muons"),
                                       nbins = cms.int32(100),
                                       #nbins = cms.int32(60),
@@ -77,13 +78,15 @@ process.muonAnalyzer = cms.EDAnalyzer("MuonTimingValidatorDelayedMuons",
                                       #out = cms.string('test_timing_allphi_cosmics_pt20_eta1_DTChambers2_upper_prune10.root'),
                                       #out = cms.string('test_timing_allphi_cosmics_pt20_eta1_DTChambers2_upper_prune5.root'),
                                       #out = cms.string('test_timing_allphi_cosmics_pt20_eta1_DTChambers2_upper_prune2.root'),
-                                      out = cms.string('test_timing_allphi_cosmics_pt20_eta1_DTChambers2_includeTheta.root'),
+                                      #out = cms.string('test_timing_allphi_cosmics_pt20_eta1_DTChambers2_includeTheta.root'),
+                                      out = cms.string('test_timing_allphi_cosmics_pt20_eta1_DTChambers2.root'),
                                       txtout = cms.string('allphi_cosmics')
                                       )
 
 #process.prefer("GlobalTag")
 
-process.GlobalTag.globaltag = 'FT_53_V10_AN2::All'
+process.GlobalTag.globaltag = 'FT_R_70_V1::All'
+#process.GlobalTag.globaltag = 'FT_53_V10_AN2::All'
 #process.GlobalTag.globaltag = 'MC_3XY_V14::All'
 #process.GlobalTag.globaltag = 'STARTUP_V7::All'
 

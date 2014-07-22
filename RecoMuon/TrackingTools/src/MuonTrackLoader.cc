@@ -143,7 +143,7 @@ MuonTrackLoader::loadTracks(const TrajectoryContainer& trajectories,
   edm::Handle<reco::BeamSpot> beamSpot;
   event.getByToken(theBeamSpotToken, beamSpot);
 
-  LogTrace(metname) << "Create the collection of Tracks";
+  std::cout << "Create the collection of Tracks";
   
   reco::TrackRef::key_type trackIndex = 0;
   reco::TrackRef::key_type trackUpdatedIndex = 0;
@@ -260,7 +260,7 @@ MuonTrackLoader::loadTracks(const TrajectoryContainer& trajectories,
     // fill the TrackCollection
     trackCollection->push_back(track);
     iTkRef++;
-    LogTrace(metname) << "Debug Track being loaded pt "<< track.pt();
+    std::cout << "Debug Track being loaded pt "<< track.pt();
     // fill the TrackCollection updated at vtx
     if(theUpdatingAtVtx && updateResult.first) 
       updatedAtVtxTrackCollection->push_back(updateResult.second);
@@ -277,7 +277,7 @@ MuonTrackLoader::loadTracks(const TrajectoryContainer& trajectories,
 
   
   // Put the Collections in the event
-  LogTrace(metname) << "put the Collections in the event";
+  std::cout << "put the Collections in the event";
   event.put(recHitCollection,instance);
   event.put(trackExtraCollection,instance);
 
@@ -360,14 +360,14 @@ MuonTrackLoader::loadTracks(const CandidateContainer& muonCands,
   
   // create the TrackCollection of combined Trajectories
   // FIXME: could this be done one track at a time in the previous loop?
-  LogTrace(metname) << "Build combinedTracks";
+  std::cout << "Build combinedTracks";
   std::vector<bool> combTksVec(combinedTrajs.size(), false); 
   OrphanHandle<reco::TrackCollection> combinedTracks = loadTracks(combinedTrajs, event, combTksVec);
 
   OrphanHandle<reco::TrackCollection> trackerTracks;
   std::vector<bool> trackerTksVec(trackerTrajs.size(), false); 
   if(thePutTkTrackFlag) {
-    LogTrace(metname) << "Build trackerTracks: "
+    std::cout << "Build trackerTracks: "
 		      << trackerTrajs.size();
     trackerTracks = loadTracks(trackerTrajs, event, trackerTksVec, theL2SeededTkLabel, theSmoothTkTrackFlag);
   } else {
@@ -376,7 +376,7 @@ MuonTrackLoader::loadTracks(const CandidateContainer& muonCands,
     }
   }
 
-  LogTrace(metname) << "Set the final links in the MuonTrackLinks collection";
+  std::cout << "Set the final links in the MuonTrackLinks collection";
 
   unsigned int candposition(0), position(0), tkposition(0);
   //reco::TrackCollection::const_iterator glIt = combinedTracks->begin(), 
@@ -418,7 +418,7 @@ MuonTrackLoader::loadTracks(const CandidateContainer& muonCands,
     LogWarning(metname)<<"The MuonTrackLinkCollection is incomplete"; 
   
   // put the MuonCollection in the event
-  LogTrace(metname) << "put the MuonCollection in the event" << "\n";
+  std::cout << "put the MuonCollection in the event" << "\n";
   
   return event.put(trackLinksCollection);
 } 
@@ -469,7 +469,7 @@ MuonTrackLoader::loadTracks(const TrajectoryContainer& trajectories,
     return event.put(trackCollection,instance);
   }
   
-  LogTrace(metname) << "Create the collection of Tracks";
+  std::cout << "Create the collection of Tracks";
   
   edm::Handle<reco::BeamSpot> beamSpot;
   event.getByToken(theBeamSpotToken,beamSpot);
@@ -581,7 +581,7 @@ MuonTrackLoader::loadTracks(const TrajectoryContainer& trajectories,
     // fill the TrackCollection
     trackCollection->push_back(track);
     iTkRef++;
-    LogTrace(metname) << "Debug Track being loaded pt "<< track.pt();
+    std::cout << "Debug Track being loaded pt "<< track.pt();
     
     // We don't need the original trajectory anymore.
     // It has been copied by value in the trajectoryCollection, if 
@@ -594,7 +594,7 @@ MuonTrackLoader::loadTracks(const TrajectoryContainer& trajectories,
 
   
   // Put the Collections in the event
-  LogTrace(metname) << "put the Collections in the event";
+  std::cout << "put the Collections in the event";
   event.put(recHitCollection,instance);
   event.put(trackExtraCollection,instance);
 
@@ -633,7 +633,7 @@ pair<bool,reco::Track> MuonTrackLoader::buildTrackAtPCA(const Trajectory& trajec
   TrajectoryStateOnSurface innerTSOS = trajectory.geometricalInnermostState();
   
   // This is needed to extrapolate the tsos at vertex
-  LogTrace(metname) << "Propagate to PCA...";
+  std::cout << "Propagate to PCA...";
   pair<bool,FreeTrajectoryState> 
     extrapolationResult = theUpdatorAtVtx->propagate(innerTSOS, beamSpot);  
   FreeTrajectoryState ftsAtVtx;
@@ -656,8 +656,8 @@ pair<bool,reco::Track> MuonTrackLoader::buildTrackAtPCA(const Trajectory& trajec
     }
   }
     
-  LogTrace(metname) << "TSOS after the extrapolation at vtx";
-  LogTrace(metname) << debug.dumpFTS(ftsAtVtx);
+  std::cout << "TSOS after the extrapolation at vtx";
+  std::cout << debug.dumpFTS(ftsAtVtx);
   
   GlobalPoint pca = ftsAtVtx.position();
   math::XYZPoint persistentPCA(pca.x(),pca.y(),pca.z());
@@ -689,17 +689,17 @@ pair<bool,reco::Track> MuonTrackLoader::buildTrackUpdatedAtPCA(const reco::Track
 				      &*theService->magneticField(),
 				      theService->trackingGeometry());
 
-  LogTrace(metname) << "Apply the vertex constraint";
+  std::cout << "Apply the vertex constraint";
   pair<bool,FreeTrajectoryState> updateResult = theUpdatorAtVtx->update(transientTrack,beamSpot);
 
   if(!updateResult.first){
     return pair<bool,reco::Track>(false,reco::Track());
   }
 
-  LogTrace(metname) << "FTS after the vertex constraint";
+  std::cout << "FTS after the vertex constraint";
   FreeTrajectoryState &ftsAtVtx = updateResult.second;
 
-  LogTrace(metname) << debug.dumpFTS(ftsAtVtx);
+  std::cout << debug.dumpFTS(ftsAtVtx);
   
   GlobalPoint pca = ftsAtVtx.position();
   math::XYZPoint persistentPCA(pca.x(),pca.y(),pca.z());
@@ -734,7 +734,7 @@ reco::TrackExtra MuonTrackLoader::buildTrackExtra(const Trajectory& trajectory) 
   DetId outerDetId;
 
   if (trajectory.direction() == alongMomentum) {
-    LogTrace(metname)<<"alongMomentum";
+    std::cout<<"alongMomentum";
     outerTSOS = trajectory.lastMeasurement().updatedState();
     innerTSOS = trajectory.firstMeasurement().updatedState();
     outerId = trajectory.lastMeasurement().recHit()->geographicalId().rawId();
@@ -743,7 +743,7 @@ reco::TrackExtra MuonTrackLoader::buildTrackExtra(const Trajectory& trajectory) 
     outerDetId =   trajectory.lastMeasurement().recHit()->geographicalId();
   } 
   else if (trajectory.direction() == oppositeToMomentum) {
-    LogTrace(metname)<<"oppositeToMomentum";
+    std::cout<<"oppositeToMomentum";
     outerTSOS = trajectory.firstMeasurement().updatedState();
     innerTSOS = trajectory.lastMeasurement().updatedState();
     outerId = trajectory.firstMeasurement().recHit()->geographicalId().rawId();
@@ -761,8 +761,8 @@ reco::TrackExtra MuonTrackLoader::buildTrackExtra(const Trajectory& trajectory) 
   GlobalPoint hitPos = (outerRecHit->isValid()) ? outerRecHit->globalPosition() :  outerTSOS.globalParameters().position() ;
   
   if(!inside) {
-    LogTrace(metname)<<"The Global Muon outerMostMeasurementState is not compatible with the recHit detector! Setting outerMost postition to recHit position if recHit isValid: " << outerRecHit->isValid();
-    LogTrace(metname)<<"From " << outerTSOSPos << " to " <<  hitPos;
+    std::cout<<"The Global Muon outerMostMeasurementState is not compatible with the recHit detector! Setting outerMost postition to recHit position if recHit isValid: " << outerRecHit->isValid();
+    std::cout<<"From " << outerTSOSPos << " to " <<  hitPos;
   }
   
   

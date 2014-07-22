@@ -29,12 +29,18 @@ from RecoMuon.MuonIdentification.muonSelectionTypeValueMapProducer_cff import *
 # Muon Isolation sequence
 from RecoMuon.MuonIsolationProducers.muIsolation_cff import *
 
+# Seed generator
+#from RecoMuon.MuonSeedGenerator.CosmicMuonSeedProducer_cfi import *
+#CosmicMuonSeed.DTRecSegmentLabel = 'dt4DCosmicSegments'
+
+
 # ---------------------------------------------------- #
 ################## Make the sequences ##################
 # ---------------------------------------------------- #
 
 # Muon Tracking sequence
 standalonemuontracking = cms.Sequence(standAloneMuonSeeds*standAloneMuons*refittedStandAloneMuons)
+#standalonemuontracking = cms.Sequence(CosmicMuonSeed*standAloneMuons*refittedStandAloneMuons)
 globalmuontracking = cms.Sequence(globalMuons*tevMuons)
 muontracking = cms.Sequence(standalonemuontracking*globalmuontracking)
 
