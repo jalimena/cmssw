@@ -158,7 +158,8 @@ void NoBPTXMonitor::analyze(edm::Event const& iEvent, edm::EventSetup const& iSe
     if ( jetSelection_( j ) ) jets.push_back(j);
   }
   if ( int(jets.size()) < njets_ ) return;
-  double jetE = jets[0].energy();
+  double jetE = -999;
+  if(jets.size()>0) jetE = jets[0].energy();
 
   edm::Handle<reco::TrackCollection> DSAHandle;
   iEvent.getByToken( muonToken_, DSAHandle );
@@ -168,7 +169,8 @@ void NoBPTXMonitor::analyze(edm::Event const& iEvent, edm::EventSetup const& iSe
     if ( muonSelection_( m ) ) muons.push_back(m);
   }
   if ( int(muons.size()) < nmuons_ ) return;
-  double muonPt = muons[0].pt();
+  double muonPt = -999;
+  if(muons.size()>0) muonPt = muons[0].pt();
 
   // filling histograms (denominator)  
   // Filter out events if Trigger Filtering is requested
@@ -179,7 +181,7 @@ void NoBPTXMonitor::analyze(edm::Event const& iEvent, edm::EventSetup const& iSe
   muonPtNoBPTX_.denominator -> Fill(muonPt);
   muonPtNoBPTX_variableBinning_.denominator -> Fill(muonPt);
   muonPtVsLS_.denominator -> Fill(ls, muonPt);
-  
+
   // filling histograms (numerator)  
   if (num_genTriggerEventFlag_->on() && ! num_genTriggerEventFlag_->accept( iEvent, iSetup) ) return;
   jetENoBPTX_.numerator -> Fill(jetE);
@@ -188,14 +190,13 @@ void NoBPTXMonitor::analyze(edm::Event const& iEvent, edm::EventSetup const& iSe
   muonPtNoBPTX_.numerator -> Fill(muonPt);
   muonPtNoBPTX_variableBinning_.numerator -> Fill(muonPt);
   muonPtVsLS_.numerator -> Fill(ls, muonPt);
-
 }
 
 void NoBPTXMonitor::fillHistoPSetDescription(edm::ParameterSetDescription & pset)
 {
-  pset.add<int>   ( "nbins");
-  pset.add<double>( "xmin" );
-  pset.add<double>( "xmax" );
+  pset.add<int>   ( "nbins", 200);
+  pset.add<double>( "xmin", -0.5 );
+  pset.add<double>( "xmax", 19999.5 );
 }
 
 void NoBPTXMonitor::fillHistoLSPSetDescription(edm::ParameterSetDescription & pset)
@@ -233,15 +234,18 @@ void NoBPTXMonitor::fillDescriptions(edm::ConfigurationDescriptions & descriptio
   desc.add<edm::ParameterSetDescription>("denGenericTriggerEventPSet", genericTriggerEventPSet);
 
   edm::ParameterSetDescription histoPSet;
-  edm::ParameterSetDescription metPSet;
-  fillHistoPSetDescription(metPSet);
-  histoPSet.add<edm::ParameterSetDescription>("metPSet", metPSet);
-  std::vector<double> bins = {0.,20.,40.,60.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180.,190.,200.,220.,240.,260.,280.,300.,350.,400.,450.,1000.};
-  histoPSet.add<std::vector<double> >("metBinning", bins);
-
+  edm::ParameterSetDescription jetEPSet;
+  edm::ParameterSetDescription muonPtPSet;
   edm::ParameterSetDescription lsPSet;
+  fillHistoPSetDescription(jetEPSet);
+  fillHistoPSetDescription(muonPtPSet);
   fillHistoLSPSetDescription(lsPSet);
+  histoPSet.add<edm::ParameterSetDescription>("jetEPSet", jetEPSet);
+  histoPSet.add<edm::ParameterSetDescription>("muonPtPSet", muonPtPSet);
   histoPSet.add<edm::ParameterSetDescription>("lsPSet", lsPSet);
+  std::vector<double> bins = {0.,20.,40.,60.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180.,190.,200.,220.,240.,260.,280.,300.,350.,400.,450.,1000.};
+  histoPSet.add<std::vector<double> >("jetEBinning", bins);
+  histoPSet.add<std::vector<double> >("muonPtBinning", bins);
 
   desc.add<edm::ParameterSetDescription>("histoPSet",histoPSet);
 
