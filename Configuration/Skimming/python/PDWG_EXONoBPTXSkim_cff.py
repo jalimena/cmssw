@@ -1,8 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 
-#from Configuration.StandardSequences.Reconstruction_cff import *
-
-
 # Pick branches you want to keep
 EXONoBPTXSkim_EventContent = cms.PSet(
      outputCommands = cms.untracked.vstring(
@@ -26,6 +23,3 @@ EXONoBPTXSkim_EventContent = cms.PSet(
                      'keep *_TriggerResults_*_*',
      )
 )
-
-#EXONoBPTXSkimSequence = cms.Sequence(
-#)
